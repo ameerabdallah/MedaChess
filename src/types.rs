@@ -1,3 +1,23 @@
+enum Piece {
+    ES, // Empty Square
+    
+    // White Pieces
+    WK, // White King
+    WQ, // White Queen
+    WR, // White Rook
+    WB, // White Bishop
+    WN, // White Knight
+    WP, // White Pawn
+
+    // Black Pieces
+    BK, // Black King
+    BQ, // Black Queen
+    BR, // Black Rook
+    BB, // Black Bishop
+    BN, // Black Knight
+    BP,  // Black Pawn
+}
+
 
 // #[repr)]
 // enum Score {
