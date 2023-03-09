@@ -2,6 +2,10 @@ use std::{str::SplitWhitespace, io};
 
 static START_FEN: &str = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
+enum UciCommand {
+    
+}
+
 struct Uci {
     position: Position,
     stateStack: Vec<StateInfo>,

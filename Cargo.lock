@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "meda_chess"
+name = "MedaChess"
 version = "0.1.0"
