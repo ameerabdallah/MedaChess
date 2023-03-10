@@ -6,13 +6,13 @@ pub(super) mod files {
     use super::Bitboard;
 
     pub const MASK_FILE_A_BB: Bitboard = 0x101010101010101;
-    pub const MASK_FILE_B_BB: Bitboard = MASK_FILE_A_BB << 8;
-    pub const MASK_FILE_C_BB: Bitboard = MASK_FILE_B_BB << 8;
-    pub const MASK_FILE_D_BB: Bitboard = MASK_FILE_C_BB << 8;
-    pub const MASK_FILE_E_BB: Bitboard = MASK_FILE_D_BB << 8;
-    pub const MASK_FILE_F_BB: Bitboard = MASK_FILE_E_BB << 8;
-    pub const MASK_FILE_G_BB: Bitboard = MASK_FILE_F_BB << 8;
-    pub const MASK_FILE_H_BB: Bitboard = MASK_FILE_G_BB << 8;
+    pub const MASK_FILE_B_BB: Bitboard = MASK_FILE_A_BB << 1;
+    pub const MASK_FILE_C_BB: Bitboard = MASK_FILE_B_BB << 1;
+    pub const MASK_FILE_D_BB: Bitboard = MASK_FILE_C_BB << 1;
+    pub const MASK_FILE_E_BB: Bitboard = MASK_FILE_D_BB << 1;
+    pub const MASK_FILE_F_BB: Bitboard = MASK_FILE_E_BB << 1;
+    pub const MASK_FILE_G_BB: Bitboard = MASK_FILE_F_BB << 1;
+    pub const MASK_FILE_H_BB: Bitboard = MASK_FILE_G_BB << 1;
     
     pub const CLEAR_FILE_A_BB: Bitboard = !MASK_FILE_A_BB;
     pub const CLEAR_FILE_B_BB: Bitboard = !MASK_FILE_B_BB;
@@ -47,12 +47,12 @@ pub(super) mod ranks {
 }
 
 pub(super) mod initial_positions {
-    use super::Bitboard;
+    use super::{Bitboard, ranks::MASK_RANK2_BB};
 
     const RANK_2_TO_7: u8 = 8 * 5; // 8 bits per rank, 5 ranks between 2 and 7
     const RANK_1_TO_8: u8 = 8 * 7; // 8 bits per rank, 7 ranks between 1 and 8
 
-    pub const WHITE_PAWNS_BB: Bitboard = 0x000000000000FF00;
+    pub const WHITE_PAWNS_BB: Bitboard = MASK_RANK2_BB;
     pub const BLACK_PAWNS_BB: Bitboard = WHITE_PAWNS_BB << RANK_2_TO_7;
     pub const WHITE_KNIGHTS_BB: Bitboard = 0x0000000000000042;
     pub const BLACK_KNIGHTS_BB: Bitboard = WHITE_KNIGHTS_BB << RANK_1_TO_8;

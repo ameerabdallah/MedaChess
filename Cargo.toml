@@ -1,5 +1,9 @@
 [package]
-name = "MedaChess"
+name = "meda_chess"
 version = "0.1.0"
 edition = "2021"
 authors = ["Ameer Abdallah"]
+
+[dependencies]
+strum = "0.24.1"
+strum_macros = "0.24.3"

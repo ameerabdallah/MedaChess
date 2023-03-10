@@ -1,6 +1,8 @@
+use strum_macros::{EnumIter, AsRefStr};
+
 use super::bb_utils::Bitboard;
 
-struct Bitboards {
+pub struct Bitboards {
     // 0-5: white pieces
     // 6-11: black pieces
     all_bbs: [Bitboard; 12],
@@ -11,13 +13,44 @@ struct Bitboards {
 }
 
 impl Bitboards {
-    fn update_bb(&mut self, piece: Piece, color: Color, new_bitboard: Bitboard) {
+    pub fn new() -> Bitboards {
+        use super::bb_utils::initial_positions::*;
+        let mut bbs = Bitboards {
+            all_bbs: [0; 12],
+            all_white_pieces_bb: 0,
+            all_black_pieces_bb: 0,
+            all_pieces_bb: 0
+        };
+
+        // update bb with all piece and color variations
+        bbs.update_bb(Piece::King, Color::White, WHITE_KINGS_BB);
+        bbs.update_bb(Piece::King, Color::Black, BLACK_KINGS_BB);
+        bbs.update_bb(Piece::Queen, Color::White, WHITE_QUEENS_BB);
+        bbs.update_bb(Piece::Queen, Color::Black, BLACK_QUEENS_BB);
+        bbs.update_bb(Piece::Rook, Color::White, WHITE_ROOKS_BB);
+        bbs.update_bb(Piece::Rook, Color::Black, BLACK_ROOKS_BB);
+        bbs.update_bb(Piece::Bishop, Color::White, WHITE_BISHOPS_BB);
+        bbs.update_bb(Piece::Bishop, Color::Black, BLACK_BISHOPS_BB);
+        bbs.update_bb(Piece::Pawn, Color::White, WHITE_PAWNS_BB);
+        bbs.update_bb(Piece::Pawn, Color::Black, BLACK_PAWNS_BB);
+
+        bbs.update_bb(Piece::Knight, Color::White, WHITE_KNIGHTS_BB);
+        bbs.update_bb(Piece::Knight, Color::Black, BLACK_KNIGHTS_BB);
+
+        bbs
+    }
+
+    pub fn update_bb(&mut self, piece: Piece, color: Color, new_bitboard: Bitboard) {
         self.all_bbs[Self::get_bb_index(piece, color)] = new_bitboard;
 
         match color {
             Color::White => self.update_all_white_pieces_bb(),
             Color::Black => self.update_all_black_pieces_bb(),
         };
+    }
+    
+    pub fn get_bb(&self, piece: Piece, color: Color) -> Bitboard {
+        self.all_bbs[Self::get_bb_index(piece, color)]
     }
 
     fn update_all_white_pieces_bb(&mut self) {
@@ -45,15 +78,15 @@ impl Bitboards {
     }
 }
 
-#[derive(Copy, Clone)]
-enum Color {
+#[derive(Copy, Clone, EnumIter, AsRefStr)]
+pub enum Color {
     White = 0,
     Black = 6
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, EnumIter, AsRefStr)]
 #[repr(usize)]
-enum Piece {
+pub enum Piece {
     King,
     Queen,
     Rook,
@@ -62,7 +95,7 @@ enum Piece {
     Pawn
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, EnumIter, AsRefStr)]
 pub enum File {
     A,
     B,
@@ -116,6 +149,7 @@ impl FileBBs {
     }
 }
 
+#[derive(Copy, Clone, EnumIter, AsRefStr)]
 pub enum Rank {
     Rank1,
     Rank2,
@@ -169,7 +203,7 @@ impl RankBBs {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, EnumIter, AsRefStr)]
 pub enum Square {
     A1, B1, C1, D1, E1, F1, G1, H1,
     A2, B2, C2, D2, E2, F2, G2, H2,
@@ -200,4 +234,21 @@ impl SquareBBs {
     pub fn get_square_bb(&self, square: Square) -> Bitboard {
         self.squares[square as usize]
     }
+}
+
+pub fn get_board_string(b_board: Bitboard) -> String {
+    println!("b_board: {:#x}", b_board);
+    let mut board_string = String::new();
+    for i in 0..64 {
+        if b_board & (1 << i) != 0 {
+            board_string.push('1');
+        } else {
+            board_string.push('0');
+        }
+        board_string.push(' ');
+        if i % 8 == 7 {
+            board_string.push('\n');
+        }
+    }
+    board_string
 }
