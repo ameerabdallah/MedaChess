@@ -1,52 +1,64 @@
+use strum::{EnumCount, IntoEnumIterator};
 use strum_macros::{EnumIter, AsRefStr};
+
+use crate::types::{Piece, Color, TOTAL_NUM_PIECES};
 
 use super::bb_utils::Bitboard;
 
 pub struct Bitboards {
     // 0-5: white pieces
     // 6-11: black pieces
-    all_bbs: [Bitboard; 12],
+    all_bbs: [Bitboard; TOTAL_NUM_PIECES],
 
-    all_white_pieces_bb: Bitboard, // all white pieces
-    all_black_pieces_bb: Bitboard, // all black pieces
+    white_pieces_bb: Bitboard, // all white pieces
+    black_pieces_bb: Bitboard, // all black pieces
     all_pieces_bb: Bitboard   // all pieces
 }
 
 impl Bitboards {
     pub fn new() -> Bitboards {
-        use super::bb_utils::initial_positions::*;
         let mut bbs = Bitboards {
-            all_bbs: [0; 12],
-            all_white_pieces_bb: 0,
-            all_black_pieces_bb: 0,
+            all_bbs: [0; TOTAL_NUM_PIECES],
+            white_pieces_bb: 0,
+            black_pieces_bb: 0,
             all_pieces_bb: 0
         };
 
-        // update bb with all piece and color variations
-        bbs.update_bb(Piece::King, Color::White, WHITE_KINGS_BB);
-        bbs.update_bb(Piece::King, Color::Black, BLACK_KINGS_BB);
-        bbs.update_bb(Piece::Queen, Color::White, WHITE_QUEENS_BB);
-        bbs.update_bb(Piece::Queen, Color::Black, BLACK_QUEENS_BB);
-        bbs.update_bb(Piece::Rook, Color::White, WHITE_ROOKS_BB);
-        bbs.update_bb(Piece::Rook, Color::Black, BLACK_ROOKS_BB);
-        bbs.update_bb(Piece::Bishop, Color::White, WHITE_BISHOPS_BB);
-        bbs.update_bb(Piece::Bishop, Color::Black, BLACK_BISHOPS_BB);
-        bbs.update_bb(Piece::Pawn, Color::White, WHITE_PAWNS_BB);
-        bbs.update_bb(Piece::Pawn, Color::Black, BLACK_PAWNS_BB);
-
-        bbs.update_bb(Piece::Knight, Color::White, WHITE_KNIGHTS_BB);
-        bbs.update_bb(Piece::Knight, Color::Black, BLACK_KNIGHTS_BB);
-
+        bbs.init();
         bbs
     }
 
-    pub fn update_bb(&mut self, piece: Piece, color: Color, new_bitboard: Bitboard) {
+    pub fn init(&mut self) {
+        use Piece::*;
+        use Color::*;
+        use super::bb_utils::initial_positions::*;
+
+        self.all_bbs[Self::get_bb_index(King, White)] = WHITE_KINGS_BB;
+        self.all_bbs[Self::get_bb_index(King, Black)] = BLACK_KINGS_BB;
+        self.all_bbs[Self::get_bb_index(Queen, White)] = WHITE_QUEENS_BB;
+        self.all_bbs[Self::get_bb_index(Queen, Black)] = BLACK_QUEENS_BB;
+        self.all_bbs[Self::get_bb_index(Rook, White)] = WHITE_ROOKS_BB;
+        self.all_bbs[Self::get_bb_index(Rook, Black)] = BLACK_ROOKS_BB;
+        self.all_bbs[Self::get_bb_index(Bishop, White)] = WHITE_BISHOPS_BB;
+        self.all_bbs[Self::get_bb_index(Bishop, Black)] = BLACK_BISHOPS_BB;
+        self.all_bbs[Self::get_bb_index(Pawn, White)] = WHITE_PAWNS_BB;
+        self.all_bbs[Self::get_bb_index(Pawn, Black)] = BLACK_PAWNS_BB;
+        self.all_bbs[Self::get_bb_index(Knight, White)] = WHITE_KNIGHTS_BB;
+        self.all_bbs[Self::get_bb_index(Knight, Black)] = BLACK_KNIGHTS_BB;
+        
+        self.white_pieces_bb = WHITE_BB;
+        self.black_pieces_bb = BLACK_BB;
+        self.all_pieces_bb = ALL_PIECES_BB;
+    }
+
+    pub fn update_bb(&mut self, piece: Piece, color: Color, new_bitboard: Bitboard) -> &mut Bitboards {
         self.all_bbs[Self::get_bb_index(piece, color)] = new_bitboard;
 
         match color {
             Color::White => self.update_all_white_pieces_bb(),
             Color::Black => self.update_all_black_pieces_bb(),
-        };
+        }
+        self
     }
     
     pub fn get_bb(&self, piece: Piece, color: Color) -> Bitboard {
@@ -54,45 +66,28 @@ impl Bitboards {
     }
 
     fn update_all_white_pieces_bb(&mut self) {
-        self.all_white_pieces_bb = 0;
-        for i in 0..6 {
-            self.all_white_pieces_bb |= self.all_bbs[i];
+        self.white_pieces_bb = 0;
+        for i in 0..Piece::COUNT {
+            self.white_pieces_bb |= self.all_bbs[i];
         }
         self.update_all_pieces_bb();
     }
 
     fn update_all_black_pieces_bb(&mut self) {
-        self.all_black_pieces_bb = 0;
-        for i in 6..12 {
-            self.all_black_pieces_bb |= self.all_bbs[i];
+        self.black_pieces_bb = 0;
+        for i in Piece::COUNT..(Piece::COUNT * Color::COUNT) {
+            self.black_pieces_bb |= self.all_bbs[i];
         }
         self.update_all_pieces_bb();
     }
 
     fn update_all_pieces_bb(&mut self) {
-        self.all_pieces_bb = self.all_white_pieces_bb | self.all_black_pieces_bb;
+        self.all_pieces_bb = self.white_pieces_bb | self.black_pieces_bb;
     }
 
     fn get_bb_index(piece: Piece, color: Color) -> usize {
         piece as usize + color as usize
     }
-}
-
-#[derive(Copy, Clone, EnumIter, AsRefStr)]
-pub enum Color {
-    White = 0,
-    Black = 6
-}
-
-#[derive(Copy, Clone, EnumIter, AsRefStr)]
-#[repr(usize)]
-pub enum Piece {
-    King,
-    Queen,
-    Rook,
-    Bishop,
-    Knight,
-    Pawn
 }
 
 #[derive(Copy, Clone, EnumIter, AsRefStr)]
@@ -213,6 +208,17 @@ pub enum Square {
     A6, B6, C6, D6, E6, F6, G6, H6,
     A7, B7, C7, D7, E7, F7, G7, H7,
     A8, B8, C8, D8, E8, F8, G8, H8
+}
+
+impl Square {
+    pub fn get_square(file: File, rank: Rank) -> Square {
+        let file_index = file as usize;
+        let rank_index = rank as usize;
+        let square_index = (rank_index * 8) + file_index;
+        Square::iter()
+            .nth(square_index)
+            .unwrap_or_else(|| panic!("Invalid square index: {}", square_index))
+    }
 }
 
 pub struct SquareBBs {
