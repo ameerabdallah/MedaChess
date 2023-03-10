@@ -1,5 +1,3 @@
-use std::iter;
-
 use super::bb_utils::Bitboard;
 
 struct Bitboards {
@@ -65,7 +63,7 @@ enum Piece {
 }
 
 #[derive(Copy, Clone)]
-enum File {
+pub enum File {
     A,
     B,
     C,
@@ -76,13 +74,13 @@ enum File {
     H
 }
 
-struct FileBBs {
+pub struct FileBBs {
     mask_files: [Bitboard; 8],
     clear_files: [Bitboard; 8],
 }
 
 impl FileBBs {
-    fn new() -> FileBBs {
+    pub fn new() -> FileBBs {
         use super::bb_utils::files::*;
 
         FileBBs {
@@ -109,16 +107,16 @@ impl FileBBs {
         }
     }
 
-    fn get_mask_file(&self, file: File) -> Bitboard {
+    pub fn get_mask_file(&self, file: File) -> Bitboard {
         self.mask_files[file as usize]
     }
 
-    fn get_clear_file(&self, file: File) -> Bitboard {
+    pub fn get_clear_file(&self, file: File) -> Bitboard {
         self.clear_files[file as usize]
     }
 }
 
-enum Rank {
+pub enum Rank {
     Rank1,
     Rank2,
     Rank3,
@@ -129,13 +127,13 @@ enum Rank {
     Rank8,
 }
 
-struct RankBBs {
+pub struct RankBBs {
     mask_ranks: [Bitboard; 8],
     clear_ranks: [Bitboard; 8],
 }
 
 impl RankBBs {
-    fn new() -> RankBBs {
+    pub fn new() -> RankBBs {
         use super::bb_utils::ranks::*;
 
         RankBBs {
@@ -162,17 +160,17 @@ impl RankBBs {
         }
     }
 
-    fn get_mask_rank(&self, rank: Rank) -> Bitboard {
+    pub fn get_mask_rank(&self, rank: Rank) -> Bitboard {
         self.mask_ranks[rank as usize]
     }
 
-    fn get_clear_rank(&self, rank: Rank) -> Bitboard {
+    pub fn get_clear_rank(&self, rank: Rank) -> Bitboard {
         self.clear_ranks[rank as usize]
     }
 }
 
 #[derive(Copy, Clone)]
-enum Square {
+pub enum Square {
     A1, B1, C1, D1, E1, F1, G1, H1,
     A2, B2, C2, D2, E2, F2, G2, H2,
     A3, B3, C3, D3, E3, F3, G3, H3,
@@ -183,12 +181,12 @@ enum Square {
     A8, B8, C8, D8, E8, F8, G8, H8
 }
 
-struct SquareBBs {
+pub struct SquareBBs {
     squares: [Bitboard; 64],
 }
 
 impl SquareBBs {
-    fn new() -> SquareBBs {
+    pub fn new() -> SquareBBs {
         use super::bb_utils::A1;
         let mut squares: [Bitboard; 64] = [0; 64];
         for i in 0..64 {
@@ -199,7 +197,7 @@ impl SquareBBs {
         }
     }
 
-    fn get_square_bb(&self, square: Square) -> Bitboard {
+    pub fn get_square_bb(&self, square: Square) -> Bitboard {
         self.squares[square as usize]
     }
 }

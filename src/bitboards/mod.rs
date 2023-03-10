@@ -1,2 +1,2 @@
 mod bb_utils;
-mod bitboard;
+pub(crate) mod bitboard;
