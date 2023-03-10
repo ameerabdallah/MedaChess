@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 mod uci;
 mod types;
-mod bitboard;
+mod bitboards;
 
 // pub static OPTIONS: HashMap<String, String> = HashMap::new();
 
