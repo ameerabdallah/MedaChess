@@ -1,41 +1,23 @@
-use bitboards::bitboard::{ File, FileBBs, Rank, RankBBs, Square, SquareBBs, Bitboards };
+use bitboards::{ranks::Rank, files::File, bitboards::Bitboards};
 use strum::IntoEnumIterator;
-use types::{Piece, Color};
+use types::{PieceType, Color};
 
-use crate::bitboards::bitboard::get_board_string;
+use crate::bitboards::{bitboards::get_board_string, tables::{SQUARE_BBS, FILE_BBS, RANK_BBS}, squares::Square};
 mod uci;
 mod types;
 mod bitboards;
 
 fn main() {
     let stdin = std::io::stdin();
-    let file_bbs = FileBBs::new();
-    let rank_bbs = RankBBs::new();
-    let square_bbs = SquareBBs::new();
-    let bbs = Bitboards::new();
     let mut input = String::new();
-
-    for file in File::iter() {
-        for rank in Rank::iter() {
-            println!(
-                "{}{} = {}",
-                file.as_ref(),
-                rank as isize + 1,
-                Square::get_square(file, rank).as_ref()
-            );
-            stdin.read_line(&mut input).unwrap();
-            if input.eq("q\n") {
-                break;
-            }
-        }
-    }
+    let bbs: Bitboards = Bitboards::new();
 
     for file in File::iter() {
         println!(
             "{} File\nmask:\n{}\nclear:\n{}",
             file.as_ref(),
-            get_board_string(file_bbs.get_mask_file(file)),
-            get_board_string(file_bbs.get_clear_file(file))
+            get_board_string(FILE_BBS[file]),
+            get_board_string(FILE_BBS.clear_file(file))
         );
         stdin.read_line(&mut input).unwrap();
         if input.eq("q\n") {
@@ -47,8 +29,8 @@ fn main() {
         println!(
             "{} Rank\nmask:\n{}\nclear:\n{}",
             rank.as_ref(),
-            get_board_string(rank_bbs.get_mask_rank(rank)),
-            get_board_string(rank_bbs.get_clear_rank(rank))
+            get_board_string(RANK_BBS.mask_rank(rank)),
+            get_board_string(RANK_BBS.clear_rank(rank))
         );
 
         stdin.read_line(&mut input).unwrap();
@@ -61,7 +43,7 @@ fn main() {
         println!(
             "{} Square:\n{}",
             square.as_ref(),
-            get_board_string(square_bbs.get_square_bb(square))
+            get_board_string(SQUARE_BBS[square])
         );
 
         stdin.read_line(&mut input).unwrap();
@@ -70,7 +52,7 @@ fn main() {
         }
     }
     input = String::new();
-    for piece in Piece::iter() {
+    for piece in PieceType::iter() {
         for color in Color::iter() {
             println!(
                 "{} {}:\n{}",

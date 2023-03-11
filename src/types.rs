@@ -1,20 +1,26 @@
-use strum::{EnumCount};
+use strum::EnumCount;
 use strum_macros::{ EnumIter, AsRefStr, EnumCount };
 
-pub const TOTAL_NUM_PIECES: usize = Piece::COUNT * Color::COUNT;
+use crate::bitboards::{bitboards::Bitboards, types::Bitboard};
+
+pub const TOTAL_NUM_PIECES: usize = PieceType::COUNT * Color::COUNT;
 
 #[derive(Copy, Clone, EnumIter, AsRefStr, EnumCount)]
 pub enum Color {
     White = 0,
-    Black = Piece::COUNT as isize,
+    Black = PieceType::COUNT as isize,
 }
 
 #[derive(Copy, Clone, EnumIter, AsRefStr, EnumCount)]
-pub enum Piece {
+pub enum PieceType {
     King,
     Queen,
     Rook,
     Bishop,
     Knight,
     Pawn,
+}
+
+pub trait NonpawnMaterial {
+    fn generate_moves(&self, bitboards: &Bitboards, color: Color) -> Bitboard;
 }
