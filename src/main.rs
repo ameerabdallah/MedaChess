@@ -1,4 +1,4 @@
-use bitboards::{ranks::Rank, files::File, bitboards::Bitboards};
+use bitboards::{ranks::Rank, files::File, bitboards::Bitboards, types::MaskOrClear::*};
 use strum::IntoEnumIterator;
 use types::{PieceType, Color};
 
@@ -6,6 +6,7 @@ use crate::bitboards::{bitboards::get_board_string, tables::{SQUARE_BBS, FILE_BB
 mod uci;
 mod types;
 mod bitboards;
+mod movegen;
 
 fn main() {
     let stdin = std::io::stdin();
@@ -16,8 +17,8 @@ fn main() {
         println!(
             "{} File\nmask:\n{}\nclear:\n{}",
             file.as_ref(),
-            get_board_string(FILE_BBS[file]),
-            get_board_string(FILE_BBS.clear_file(file))
+            get_board_string(FILE_BBS[(file, Mask)]),
+            get_board_string(FILE_BBS[(file, Clear)])
         );
         stdin.read_line(&mut input).unwrap();
         if input.eq("q\n") {

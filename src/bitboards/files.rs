@@ -2,7 +2,7 @@ use std::ops::Index;
 
 use strum_macros::{EnumIter, AsRefStr};
 
-use super::types::Bitboard;
+use super::types::{Bitboard, MaskOrClear};
 
 #[derive(Copy, Clone, EnumIter, AsRefStr)]
 pub enum File {
@@ -67,19 +67,15 @@ impl FileBBs {
         }
     }
 
-    pub const fn mask_file(&self, file: File) -> Bitboard {
-        self.mask_files[file as usize]
-    }
-
-    pub const fn clear_file(&self, file: File) -> Bitboard {
-        self.clear_files[file as usize]
-    }
 }
 
-impl Index<File> for FileBBs {
+impl Index<(File, MaskOrClear)> for FileBBs {
     type Output = Bitboard;
 
-    fn index(&self, index: File) -> &Self::Output {
-        &self.mask_files[index as usize]
+    fn index(&self, index: (File, MaskOrClear)) -> &Self::Output {
+        match index.1 {
+            MaskOrClear::Mask => &self.mask_files[index.0 as usize],
+            MaskOrClear::Clear => &self.clear_files[index.0 as usize],
+        }
     }
 }

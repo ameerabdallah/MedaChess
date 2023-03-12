@@ -30,7 +30,7 @@ impl Bitboards {
     pub fn init(&mut self) {
         use PieceType::*;
         use Color::*;
-        use super::initial_positions::*;
+        use super::initial_pos::*;
 
         self.all_bbs[Self::get_bb_index(King, White)] = WHITE_KINGS_BB;
         self.all_bbs[Self::get_bb_index(King, Black)] = BLACK_KINGS_BB;
@@ -92,6 +92,17 @@ impl Bitboards {
     fn get_bb_index(piece: PieceType, color: Color) -> usize {
         (piece as usize) + (color as usize)
     }
+
+    pub fn get_pieces_bb(&self, color: Color) -> Bitboard {
+        match color {
+            Color::White => self.white_pieces_bb,
+            Color::Black => self.black_pieces_bb,
+        }
+    }
+
+    pub fn get_all_pieces(&self) -> Bitboard {
+        self.all_pieces_bb
+    }
 }
 
 pub fn get_board_string(b_board: Bitboard) -> String {
@@ -102,7 +113,7 @@ pub fn get_board_string(b_board: Bitboard) -> String {
         if (flipped_board & (1 << i)) != 0 {
             board_string.push('1');
         } else {
-            board_string.push('0');
+            board_string.push('.');
         }
         board_string.push(' ');
         if i % 8 == 7 {
@@ -124,14 +135,14 @@ fn flip_board_vertical(b_board: Bitboard) -> Bitboard {
 
 #[cfg(test)]
 mod tests {
-    use crate::bitboards::{ tables::{ SQUARE_BBS, RANK_BBS }, ranks::Rank::*, squares::Square::* };
+    use crate::bitboards::{ tables::{ SQUARE_BBS, RANK_BBS }, ranks::Rank::*, squares::Square::*, types::MaskOrClear::* };
     use super::*;
 
     #[test]
     fn test_flip_board_vertical() {
-        let mut bb_1 = RANK_BBS[R1] | SQUARE_BBS[B4];
+        let mut bb_1 = RANK_BBS[(R1, Mask)] | SQUARE_BBS[B4];
         bb_1 = flip_board_vertical(bb_1);
-        let mut bb_2 = RANK_BBS[R8] | SQUARE_BBS[B5];
+        let mut bb_2 = RANK_BBS[(R8, Mask)] | SQUARE_BBS[B5];
         assert_eq!(bb_1, bb_2);
         bb_2 = flip_board_vertical(bb_2);
         bb_1 = flip_board_vertical(bb_1);
@@ -179,16 +190,16 @@ mod tests {
         assert_eq!(flip_board_vertical(white_king_bb), black_king_bb);
 
         // ensure that pawns are on the correct ranks (only need to test white since we already tested symmetry)
-        assert_eq!(white_pawns_bb & RANK_BBS[R2], RANK_BBS[R2]);
+        assert_eq!(white_pawns_bb & RANK_BBS[(R2, Mask)], RANK_BBS[(R2, Mask)]);
 
         // ensure remaining pieces occupy their corresponding files (once again, symmetry is already tested)
-        assert_eq!(white_knights_bb & RANK_BBS[R1], SQUARE_BBS[B1] | SQUARE_BBS[G1]);
-        assert_eq!(white_bishops_bb & RANK_BBS[R1], SQUARE_BBS[C1] | SQUARE_BBS[F1]);
-        assert_eq!(white_rooks_bb & RANK_BBS[R1], SQUARE_BBS[A1] | SQUARE_BBS[H1]);
-        assert_eq!(white_queens_bb & RANK_BBS[R1], SQUARE_BBS[D1]);
-        assert_eq!(white_king_bb & RANK_BBS[R1], SQUARE_BBS[E1]);
+        assert_eq!(white_knights_bb & RANK_BBS[(R1, Mask)], SQUARE_BBS[B1] | SQUARE_BBS[G1]);
+        assert_eq!(white_bishops_bb & RANK_BBS[(R1, Mask)], SQUARE_BBS[C1] | SQUARE_BBS[F1]);
+        assert_eq!(white_rooks_bb & RANK_BBS[(R1, Mask)], SQUARE_BBS[A1] | SQUARE_BBS[H1]);
+        assert_eq!(white_queens_bb & RANK_BBS[(R1, Mask)], SQUARE_BBS[D1]);
+        assert_eq!(white_king_bb & RANK_BBS[(R1, Mask)], SQUARE_BBS[E1]);
 
         // ensure all white pieces occupy the ranks 1 and 2
-        assert_eq!(white_pieces_bb & (RANK_BBS[R1] | RANK_BBS[R2]), RANK_BBS[R1] | RANK_BBS[R2]);
+        assert_eq!(white_pieces_bb & (RANK_BBS[(R1, Mask)] | RANK_BBS[(R2, Mask)]), RANK_BBS[(R1, Mask)] | RANK_BBS[(R2, Mask)]);
     }
 }

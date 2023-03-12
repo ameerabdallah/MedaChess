@@ -1,8 +1,8 @@
-use std::ops::Index;
+use std::{ops::Index};
 
 use strum_macros::{EnumIter, AsRefStr};
 
-use super::types::Bitboard;
+use super::types::{Bitboard, MaskOrClear};
 
 
 #[derive(Copy, Clone, EnumIter, AsRefStr)]
@@ -77,10 +77,13 @@ impl RankBBs {
     }
 }
 
-impl Index<Rank> for RankBBs {
+impl Index<(Rank, MaskOrClear)> for RankBBs {
     type Output = Bitboard;
 
-    fn index(&self, index: Rank) -> &Self::Output {
-        &self.mask_ranks[index as usize]
+    fn index(&self, index: (Rank, MaskOrClear)) -> &Self::Output {
+        match index.1 {
+            MaskOrClear::Mask => &self.mask_ranks[index.0 as usize],
+            MaskOrClear::Clear => &self.clear_ranks[index.0 as usize],
+        }
     }
 }
