@@ -2,7 +2,7 @@ use strum::EnumCount;
 
 use crate::types::{ PieceType, Color, TOTAL_NUM_PIECES };
 
-use super::types::Bitboard;
+use super::bitboard::Bitboard;
 
 pub struct Bitboards {
     // 0-5: white pieces
@@ -135,14 +135,15 @@ fn flip_board_vertical(b_board: Bitboard) -> Bitboard {
 
 #[cfg(test)]
 mod tests {
-    use crate::bitboards::{ tables::{ SQUARE_BBS, RANK_BBS }, ranks::Rank::*, squares::Square::*, types::MaskOrClear::* };
+    use crate::bitboards::bitboard::{Rank::*, Square::*, rank_bbs, square_bbs};
+
     use super::*;
 
     #[test]
     fn test_flip_board_vertical() {
-        let mut bb_1 = RANK_BBS[(R1, Mask)] | SQUARE_BBS[B4];
+        let mut bb_1 =  rank_bbs(Rank1) | square_bbs(B4);
         bb_1 = flip_board_vertical(bb_1);
-        let mut bb_2 = RANK_BBS[(R8, Mask)] | SQUARE_BBS[B5];
+        let mut bb_2 =  rank_bbs(Rank8) | square_bbs(B5);
         assert_eq!(bb_1, bb_2);
         bb_2 = flip_board_vertical(bb_2);
         bb_1 = flip_board_vertical(bb_1);
@@ -190,16 +191,16 @@ mod tests {
         assert_eq!(flip_board_vertical(white_king_bb), black_king_bb);
 
         // ensure that pawns are on the correct ranks (only need to test white since we already tested symmetry)
-        assert_eq!(white_pawns_bb & RANK_BBS[(R2, Mask)], RANK_BBS[(R2, Mask)]);
+        assert_eq!(white_pawns_bb & rank_bbs(Rank2), rank_bbs(Rank2));
 
         // ensure remaining pieces occupy their corresponding files (once again, symmetry is already tested)
-        assert_eq!(white_knights_bb & RANK_BBS[(R1, Mask)], SQUARE_BBS[B1] | SQUARE_BBS[G1]);
-        assert_eq!(white_bishops_bb & RANK_BBS[(R1, Mask)], SQUARE_BBS[C1] | SQUARE_BBS[F1]);
-        assert_eq!(white_rooks_bb & RANK_BBS[(R1, Mask)], SQUARE_BBS[A1] | SQUARE_BBS[H1]);
-        assert_eq!(white_queens_bb & RANK_BBS[(R1, Mask)], SQUARE_BBS[D1]);
-        assert_eq!(white_king_bb & RANK_BBS[(R1, Mask)], SQUARE_BBS[E1]);
+        assert_eq!(white_knights_bb & rank_bbs(Rank1), square_bbs(B1) | square_bbs(G1));
+        assert_eq!(white_bishops_bb & rank_bbs(Rank1), square_bbs(C1) | square_bbs(F1));
+        assert_eq!(white_rooks_bb & rank_bbs(Rank1), square_bbs(A1) | square_bbs(H1));
+        assert_eq!(white_queens_bb & rank_bbs(Rank1), square_bbs(D1));
+        assert_eq!(white_king_bb & rank_bbs(Rank1), square_bbs(E1));
 
         // ensure all white pieces occupy the ranks 1 and 2
-        assert_eq!(white_pieces_bb & (RANK_BBS[(R1, Mask)] | RANK_BBS[(R2, Mask)]), RANK_BBS[(R1, Mask)] | RANK_BBS[(R2, Mask)]);
+        assert_eq!(white_pieces_bb & rank_bbs(Rank1) | rank_bbs(Rank2), rank_bbs(Rank1) | rank_bbs(Rank2));
     }
 }

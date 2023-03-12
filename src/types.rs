@@ -1,7 +1,7 @@
 use strum::EnumCount;
 use strum_macros::{ EnumIter, AsRefStr, EnumCount };
 
-use crate::bitboards::{bitboards::Bitboards, types::Bitboard};
+use crate::bitboards::{bitboards::Bitboards, bitboard::Bitboard};
 
 pub const TOTAL_NUM_PIECES: usize = PieceType::COUNT * Color::COUNT;
 
@@ -21,6 +21,10 @@ pub enum PieceType {
     Pawn,
 }
 
-pub trait NonpawnMaterial {
-    fn generate_moves(&self, bitboards: &Bitboards, color: Color) -> Bitboard;
+#[repr(u16)]
+enum MoveType {
+    NORMAL,
+    PROMOTION = 1 << 14,
+    ENPASSANT = 2 << 14,
+    CASTLING = 3 << 14,
 }
